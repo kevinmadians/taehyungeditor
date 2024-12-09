@@ -21,15 +21,16 @@ export default function HomePage() {
     toggleFilter,
     isImageSelected,
     hasCanvasChanged,
+    hasObjects,
   } = useFabric()
 
   return (
     <div className="min-h-screen">
-      <div className="px-2 pt-3 md:pt-16 min-h-screen flex flex-col bg-white text-black">
-        <div className="flex-1 flex items-center justify-center max-h-[75vh] md:max-h-none">
+      <div className="px-2 pt-6 md:pt-16 min-h-screen flex flex-col bg-white text-black">
+        <div className="flex-1 flex items-center justify-center max-h-[70vh] md:max-h-none">
           <canvas
             ref={canvasRef}
-            className="border rounded-3xl overflow-hidden shadow-lg max-h-full w-auto"
+            className="border rounded-3xl overflow-hidden shadow-lg max-h-full w-auto mt-4 md:mt-0"
           />
         </div>
         <div className="py-2 md:py-4 space-y-2 md:space-y-4 flex items-center flex-col">
@@ -48,6 +49,7 @@ export default function HomePage() {
             toggleFilter={toggleFilter}
             isImageSelected={isImageSelected}
             hasCanvasChanged={hasCanvasChanged}
+            hasObjects={hasObjects}
           />
           <div className="flex flex-col justify-center text-center items-center text-xs md:text-sm md:flex-row">
             <a

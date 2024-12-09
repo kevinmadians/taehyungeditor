@@ -44,6 +44,7 @@ export function useFabric() {
   const [canvas, setCanvas] = React.useState<Canvas | null>(null)
   const [isDarkMode, setIsDarkMode] = React.useState<boolean>(false)
   const [hasCanvasChanged, setHasCanvasChanged] = React.useState<boolean>(false)
+  const [hasObjects, setHasObjects] = React.useState<boolean>(false)
   const [showCenterLines, setShowCenterLines] = React.useState<boolean>(false)
   const centerLineX = React.useRef<fabric.Line | null>(null)
   const centerLineY = React.useRef<fabric.Line | null>(null)
@@ -218,8 +219,36 @@ export function useFabric() {
 
     adjustCanvasSize(fabricCanvas, isMobile) // Initial size adjustment
 
+    // Update objects state when objects are added/removed/modified
+    const updateObjectsState = () => {
+      if (!fabricCanvas) return;
+      
+      const objects = fabricCanvas.getObjects()
+      const hasAnyObjects = objects.length > 0
+      const hasSelectedObject = fabricCanvas.getActiveObject() !== null
+
+      // Only enable delete when there are objects AND one is selected
+      setHasObjects(hasAnyObjects && hasSelectedObject)
+    }
+
+    // Call updateObjectsState initially
+    updateObjectsState()
+
+    fabricCanvas.on("object:added", updateObjectsState)
+    fabricCanvas.on("object:removed", updateObjectsState)
+    fabricCanvas.on("selection:created", updateObjectsState)
+    fabricCanvas.on("selection:cleared", updateObjectsState)
+    fabricCanvas.on("selection:updated", updateObjectsState)
+    fabricCanvas.on("mouse:up", updateObjectsState)
+
     return () => {
       // Remove event listeners
+      fabricCanvas.off("object:added", updateObjectsState)
+      fabricCanvas.off("object:removed", updateObjectsState)
+      fabricCanvas.off("selection:created", updateObjectsState)
+      fabricCanvas.off("selection:cleared", updateObjectsState)
+      fabricCanvas.off("selection:updated", updateObjectsState)
+      fabricCanvas.off("mouse:up", updateObjectsState)
       fabricCanvas.off("selection:created", updateSelectedProperties)
       fabricCanvas.off("selection:updated", updateSelectedProperties)
       fabricCanvas.off("selection:cleared", updateSelectedProperties)
@@ -549,5 +578,6 @@ export function useFabric() {
     isDarkMode,
     toggleDarkMode,
     hasCanvasChanged,
+    hasObjects,
   }
 }

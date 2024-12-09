@@ -43,6 +43,7 @@ interface ToolbarProps {
   toggleFilter: () => void
   isImageSelected: boolean
   hasCanvasChanged: boolean
+  hasObjects: boolean
 }
 
 export function Toolbar({
@@ -60,6 +61,7 @@ export function Toolbar({
   toggleFilter,
   isImageSelected,
   hasCanvasChanged,
+  hasObjects,
 }: ToolbarProps) {
   const [isImageSelectorOpen, setIsImageSelectorOpen] = React.useState(false)
 
@@ -324,10 +326,15 @@ export function Toolbar({
             onClick={deleteSelectedObject}
             variant="outline"
             size="icon"
-            className="rounded-full hover:animate-jelly tooltip shrink-0"
+            className={`rounded-full tooltip shrink-0 ${
+              !hasObjects && 'opacity-50 cursor-not-allowed hover:animate-none'
+            }`}
+            disabled={!hasObjects}
           >
-            <span className="tooltiptext">Delete</span>
-            <Icons.trash className="size-4 text-red-600" />
+            <span className="tooltiptext">
+              {hasObjects ? 'Delete selected' : 'Select an object to delete'}
+            </span>
+            <Icons.trash className={`size-4 ${hasObjects ? 'text-red-600' : 'text-gray-400'}`} />
           </Button>
           <div className="h-5">
             <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
