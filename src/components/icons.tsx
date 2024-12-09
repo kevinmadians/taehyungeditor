@@ -141,4 +141,20 @@ export const Icons = {
       </g>
     </svg>
   ),
+  stickers: ({ ...props }: IconProps) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 24 24"
+      {...props}
+    >
+      <g fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.591l2.226-.595a1.634 1.634 0 0 1 1.149.133A9.958 9.958 0 0 0 12 22Z" />
+        <path strokeLinecap="round" d="M8.5 9a.5.5 0 1 1 0-1a.5.5 0 0 1 0 1Zm7 0a.5.5 0 1 1 0-1a.5.5 0 0 1 0 1Z" />
+        <path d="M15.5 9a.5.5 0 1 0 0-1a.5.5 0 0 0 0 1Z" />
+        <path strokeLinecap="round" d="M8.5 15s1.5-2 3.5-2s3.5 2 3.5 2" />
+      </g>
+    </svg>
+  ),
 }

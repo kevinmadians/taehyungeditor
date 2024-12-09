@@ -24,10 +24,10 @@ export function ImageSelector({ isOpen, onClose, onSelectImage }: ImageSelectorP
       <DialogContent className="sm:max-w-md bg-white">
         <DialogHeader>
           <DialogTitle className="text-gray-900">
-            Choose an Image
+            Choose a Sticker
           </DialogTitle>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-4 py-4">
+        <div className="grid grid-cols-3 gap-3 py-4">
           {presetImages.map((image) => (
             <button
               key={image.path}
@@ -35,16 +35,13 @@ export function ImageSelector({ isOpen, onClose, onSelectImage }: ImageSelectorP
                 onSelectImage(image.path)
                 onClose()
               }}
-              className="relative group overflow-hidden rounded-lg border-2 border-gray-200 hover:border-gray-300 transition-all hover:scale-105"
+              className="relative aspect-square p-2 flex items-center justify-center overflow-hidden rounded-lg border-2 border-gray-200 hover:border-gray-300 transition-all hover:scale-105 bg-gray-50"
             >
               <img
                 src={image.path}
                 alt={image.name}
-                className="w-full h-32 object-contain"
+                className="w-full h-full object-contain"
               />
-              <div className="absolute bottom-0 left-0 right-0 p-2 text-sm text-center transition-opacity bg-white/90 text-gray-900">
-                {image.name}
-              </div>
             </button>
           ))}
         </div>

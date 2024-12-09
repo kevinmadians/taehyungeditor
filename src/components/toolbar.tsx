@@ -97,9 +97,8 @@ export function Toolbar({
             {...getRootProps()}
             variant="outline"
             size="icon"
-            className="rounded-full hover:animate-jelly tooltip shrink-0"
+            className="rounded-full hover:animate-jelly shrink-0"
           >
-            <span className="tooltiptext">Background</span>
             <input {...getInputProps()} />
             <Icons.background className="size-4" />
           </Button>
@@ -108,11 +107,9 @@ export function Toolbar({
               <Button
                 variant="outline"
                 size="icon"
-                className="rounded-full hover:animate-jelly tooltip shrink-0"
+                className="rounded-full hover:animate-jelly shrink-0"
                 style={{ backgroundColor: currentBackgroundColor }}
-              >
-                <span className="tooltiptext">Color</span>
-              </Button>
+              />
             </PopoverTrigger>
             <PopoverContent
               className="mt-3 w-fit p-0 rounded-lg bg-transparent"
@@ -134,13 +131,9 @@ export function Toolbar({
             onClick={() => setIsImageSelectorOpen(true)}
             variant="outline"
             size="icon"
-            className="rounded-full hover:animate-jelly tooltip shrink-0"
+            className="rounded-full hover:animate-jelly shrink-0"
           >
-            <span className="tooltiptext">Add Image</span>
-            <img
-              src="/chillguy.png"
-              className="size-6"
-            />
+            <Icons.stickers className="size-5" />
           </Button>
           <ImageSelector
             isOpen={isImageSelectorOpen}
@@ -168,19 +161,17 @@ export function Toolbar({
                   onClick={() => flipImage("horizontal")}
                   variant="outline"
                   size="icon"
-                  className="rounded-full hover:animate-jelly tooltip shrink-0"
+                  className="rounded-full hover:animate-jelly shrink-0"
                 >
-                  <span className="tooltiptext">Flip</span>
                   <Icons.flip className="size-4" />
                 </Button>
                 <Button
                   onClick={() => toggleFilter()}
                   variant="outline"
                   size="icon"
-                  className="rounded-full hover:animate-jelly tooltip shrink-0"
+                  className="rounded-full hover:animate-jelly shrink-0"
                 >
                   <Icons.filters className="size-4" />
-                  <span className="tooltiptext">Filters</span>
                 </Button>
               </motion.div>
             )}
@@ -192,9 +183,8 @@ export function Toolbar({
             onClick={addText}
             variant="outline"
             size="icon"
-            className="rounded-full hover:animate-jelly tooltip shrink-0"
+            className="rounded-full hover:animate-jelly shrink-0"
           >
-            <span className="tooltiptext">Text</span>
             <Icons.text className="size-4" />
           </Button>
           <AnimatePresence>
@@ -216,9 +206,8 @@ export function Toolbar({
                     <Button
                       variant="outline"
                       size="icon"
-                      className="rounded-full hover:animate-jelly tooltip shrink-0"
+                      className="rounded-full hover:animate-jelly shrink-0"
                     >
-                      <span className="tooltiptext">Font Family</span>
                       <Icons.font className="size-4" />
                     </Button>
                   </PopoverTrigger>
@@ -295,13 +284,11 @@ export function Toolbar({
                     <Button
                       variant="outline"
                       size="icon"
-                      className="rounded-full hover:animate-jelly tooltip shrink-0"
+                      className="rounded-full hover:animate-jelly shrink-0"
                       style={{
                         backgroundColor: selectedTextProperties.fontColor,
                       }}
-                    >
-                      <span className="tooltiptext">Text Color</span>
-                    </Button>
+                    />
                   </PopoverTrigger>
                   <PopoverContent
                     className="mt-3 w-fit p-0 rounded-lg bg-transparent"
@@ -326,14 +313,11 @@ export function Toolbar({
             onClick={deleteSelectedObject}
             variant="outline"
             size="icon"
-            className={`rounded-full tooltip shrink-0 ${
+            className={`rounded-full shrink-0 ${
               !hasObjects && 'opacity-50 cursor-not-allowed hover:animate-none'
             }`}
             disabled={!hasObjects}
           >
-            <span className="tooltiptext">
-              {hasObjects ? 'Delete selected' : 'Select an object to delete'}
-            </span>
             <Icons.trash className={`size-4 ${hasObjects ? 'text-red-600' : 'text-gray-400'}`} />
           </Button>
           <div className="h-5">
@@ -343,14 +327,11 @@ export function Toolbar({
             onClick={downloadCanvas}
             variant="outline"
             size="icon"
-            className={`rounded-full hover:animate-jelly tooltip shrink-0 ${
+            className={`rounded-full hover:animate-jelly shrink-0 ${
               !hasCanvasChanged && 'opacity-50 cursor-not-allowed hover:animate-none'
             }`}
             disabled={!hasCanvasChanged}
           >
-            <span className="tooltiptext">
-              {hasCanvasChanged ? 'Download' : 'Make changes to download'}
-            </span>
             <Icons.download className="size-4" />
           </Button>
           {isMobile && (
