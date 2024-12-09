@@ -92,7 +92,7 @@ export function Toolbar({
   return (
     <div className="max-w-[100vw] px-5">
       <div className="no-scrollbar w-full overflow-x-auto rounded-full border bg-white border-gray-200 transition-colors duration-200 sm:overflow-visible">
-        <div className="flex items-center space-x-2 p-2 text-2xl md:justify-center">
+        <div className="flex items-center gap-2 p-2 text-2xl md:justify-center">
           <Button
             {...getRootProps()}
             variant="outline"
@@ -124,9 +124,6 @@ export function Toolbar({
               />
             </PopoverContent>
           </Popover>
-          <div className="h-5">
-            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
-          </div>
           <Button
             onClick={() => setIsImageSelectorOpen(true)}
             variant="outline"
@@ -155,7 +152,7 @@ export function Toolbar({
                   type: "spring",
                   damping: 50,
                 }}
-                className="flex items-center space-x-2"
+                className="flex items-center gap-2"
               >
                 <Button
                   onClick={() => flipImage("horizontal")}
@@ -176,9 +173,6 @@ export function Toolbar({
               </motion.div>
             )}
           </AnimatePresence>
-          <div className="h-5">
-            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
-          </div>
           <Button
             onClick={addText}
             variant="outline"
@@ -199,7 +193,7 @@ export function Toolbar({
                   type: "spring",
                   damping: 50,
                 }}
-                className="flex items-center space-x-2"
+                className="flex items-center gap-2"
               >
                 <Popover>
                   <PopoverTrigger asChild>
@@ -306,9 +300,6 @@ export function Toolbar({
               </motion.div>
             )}
           </AnimatePresence>
-          <div className="h-5">
-            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
-          </div>
           <Button
             onClick={deleteSelectedObject}
             variant="outline"
@@ -320,9 +311,6 @@ export function Toolbar({
           >
             <Icons.trash className={`size-4 ${hasObjects ? 'text-red-600' : 'text-gray-400'}`} />
           </Button>
-          <div className="h-5">
-            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
-          </div>
           <Button
             onClick={downloadCanvas}
             variant="outline"
@@ -334,11 +322,6 @@ export function Toolbar({
           >
             <Icons.download className="size-4" />
           </Button>
-          {isMobile && (
-            <div className="h-5 invisible">
-              <div className="h-full w-px bg-[#e5e5e5]"></div>
-            </div>
-          )}
         </div>
       </div>
     </div>
