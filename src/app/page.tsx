@@ -51,15 +51,6 @@ export default function HomePage() {
             hasCanvasChanged={hasCanvasChanged}
             hasObjects={hasObjects}
           />
-          <div className="flex flex-col justify-center text-center items-center text-xs md:text-sm md:flex-row pb-6">
-            <a
-              className="text-balance leading-none font-medium text-muted-foreground hover:text-blue-700"
-              href="https://x.com/kvinms97"
-              target="_blank"
-            >
-              Built by Kevin
-            </a>
-          </div>
         </div>
       </div>
     </div>
