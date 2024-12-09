@@ -42,7 +42,6 @@ interface ToolbarProps {
   selectedTextProperties: selectedTextPropertiesProps
   toggleFilter: () => void
   isImageSelected: boolean
-  isDarkMode: boolean
   hasCanvasChanged: boolean
 }
 
@@ -60,7 +59,6 @@ export function Toolbar({
   selectedTextProperties,
   toggleFilter,
   isImageSelected,
-  isDarkMode,
   hasCanvasChanged,
 }: ToolbarProps) {
   const [isImageSelectorOpen, setIsImageSelectorOpen] = React.useState(false)
@@ -91,14 +89,12 @@ export function Toolbar({
 
   return (
     <div className="max-w-[100vw] px-5">
-      <div className={`no-scrollbar w-full overflow-x-auto rounded-full border ${
-        isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-      } transition-colors duration-200 sm:overflow-visible`}>
+      <div className="no-scrollbar w-full overflow-x-auto rounded-full border bg-white border-gray-200 transition-colors duration-200 sm:overflow-visible">
         <div className="flex items-center space-x-2 p-2 text-2xl md:justify-center">
           <Button
             {...getRootProps()}
-            variant={isDarkMode ? "dark" : "outline"}
-            size={"icon"}
+            variant="outline"
+            size="icon"
             className="rounded-full hover:animate-jelly tooltip shrink-0"
           >
             <span className="tooltiptext">Background</span>
@@ -108,8 +104,8 @@ export function Toolbar({
           <Popover>
             <PopoverTrigger asChild>
               <Button
-                variant={isDarkMode ? "dark" : "outline"}
-                size={"icon"}
+                variant="outline"
+                size="icon"
                 className="rounded-full hover:animate-jelly tooltip shrink-0"
                 style={{ backgroundColor: currentBackgroundColor }}
               >
@@ -117,9 +113,7 @@ export function Toolbar({
               </Button>
             </PopoverTrigger>
             <PopoverContent
-              className={`mt-3 w-fit p-0 rounded-lg ${
-                isDarkMode ? 'bg-gray-800' : 'bg-transparent'
-              }`}
+              className="mt-3 w-fit p-0 rounded-lg bg-transparent"
               align="start"
             >
               <HexColorPicker
@@ -132,14 +126,12 @@ export function Toolbar({
             </PopoverContent>
           </Popover>
           <div className="h-5">
-            <div className={`mx-1.5 h-full w-px ${
-              isDarkMode ? 'bg-gray-700' : 'bg-[#e5e5e5]'
-            }`}></div>
+            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
           </div>
           <Button
             onClick={() => setIsImageSelectorOpen(true)}
-            variant={isDarkMode ? "dark" : "outline"}
-            size={"icon"}
+            variant="outline"
+            size="icon"
             className="rounded-full hover:animate-jelly tooltip shrink-0"
           >
             <span className="tooltiptext">Add Image</span>
@@ -155,7 +147,6 @@ export function Toolbar({
               addImage(imagePath)
               setIsImageSelectorOpen(false)
             }}
-            isDarkMode={isDarkMode}
           />
           <AnimatePresence>
             {isImageSelected && (
@@ -173,8 +164,8 @@ export function Toolbar({
               >
                 <Button
                   onClick={() => flipImage("horizontal")}
-                  variant={isDarkMode ? "dark" : "outline"}
-                  size={"icon"}
+                  variant="outline"
+                  size="icon"
                   className="rounded-full hover:animate-jelly tooltip shrink-0"
                 >
                   <span className="tooltiptext">Flip</span>
@@ -182,9 +173,9 @@ export function Toolbar({
                 </Button>
                 <Button
                   onClick={() => toggleFilter()}
-                  variant={isDarkMode ? "dark" : "outline"}
-                  size={"icon"}
-                  className="rounded-full hover:animate-jelly tooltip shrink-0 "
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full hover:animate-jelly tooltip shrink-0"
                 >
                   <Icons.filters className="size-4" />
                   <span className="tooltiptext">Filters</span>
@@ -193,14 +184,12 @@ export function Toolbar({
             )}
           </AnimatePresence>
           <div className="h-5">
-            <div className={`mx-1.5 h-full w-px ${
-              isDarkMode ? 'bg-gray-700' : 'bg-[#e5e5e5]'
-            }`}></div>
+            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
           </div>
           <Button
             onClick={addText}
-            variant={isDarkMode ? "dark" : "outline"}
-            size={"icon"}
+            variant="outline"
+            size="icon"
             className="rounded-full hover:animate-jelly tooltip shrink-0"
           >
             <span className="tooltiptext">Text</span>
@@ -223,8 +212,8 @@ export function Toolbar({
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
-                      variant={isDarkMode ? "dark" : "outline"}
-                      size={"icon"}
+                      variant="outline"
+                      size="icon"
                       className="rounded-full hover:animate-jelly tooltip shrink-0"
                     >
                       <span className="tooltiptext">Font Family</span>
@@ -233,22 +222,20 @@ export function Toolbar({
                   </PopoverTrigger>
                   <PopoverContent
                     align="start"
-                    className={`max-w-[200px] w-full p-0 h-[250px] rounded-lg ${
-                      isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'
-                    }`}
+                    className="max-w-[200px] w-full p-0 h-[250px] rounded-lg bg-white text-gray-900"
                     sideOffset={5}
                   >
-                    <Command className={isDarkMode ? 'bg-gray-800 [&_[cmdk-group-heading]]:text-gray-400' : 'bg-white'}>
+                    <Command className="bg-white">
                       <CommandInput 
                         placeholder="Search font family" 
-                        className={isDarkMode ? 'text-white border-gray-700 placeholder:text-gray-500' : 'text-gray-900 border-gray-200'}
+                        className="text-gray-900 border-gray-200"
                       />
                       <CommandList>
-                        <CommandEmpty className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>
+                        <CommandEmpty className="text-gray-500">
                           No font family found.
                         </CommandEmpty>
                         <CommandGroup heading={
-                          <span className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>
+                          <span className="text-gray-500">
                             Recommended
                           </span>
                         }>
@@ -256,30 +243,24 @@ export function Toolbar({
                             <CommandItem
                               key={font}
                               onSelect={() => changeFontFamily(font)}
-                              className={`cursor-pointer ${
-                                isDarkMode 
-                                  ? 'text-white hover:bg-gray-700' 
-                                  : 'text-gray-900 hover:bg-gray-100'
-                              }`}
+                              className="cursor-pointer text-gray-900 hover:bg-gray-100"
                             >
                               <button 
-                                className={`flex w-full items-center ${
-                                  isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}
+                                className="flex w-full items-center text-gray-900"
                                 onClick={() => changeFontFamily(font)}
                               >
                                 <span style={{ fontFamily: font }}>
                                   {font}
                                 </span>
                                 {selectedTextProperties.fontFamily === font && (
-                                  <CheckIcon className={`ml-auto h-4 w-4 ${isDarkMode ? 'text-white' : 'text-black'}`} />
+                                  <CheckIcon className="ml-auto h-4 w-4 text-black" />
                                 )}
                               </button>
                             </CommandItem>
                           ))}
                         </CommandGroup>
                         <CommandGroup heading={
-                          <span className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>
+                          <span className="text-gray-500">
                             Others
                           </span>
                         }>
@@ -287,23 +268,17 @@ export function Toolbar({
                             <CommandItem
                               key={font}
                               onSelect={() => changeFontFamily(font)}
-                              className={`cursor-pointer ${
-                                isDarkMode 
-                                  ? 'text-white hover:bg-gray-700' 
-                                  : 'text-gray-900 hover:bg-gray-100'
-                              }`}
+                              className="cursor-pointer text-gray-900 hover:bg-gray-100"
                             >
                               <button 
-                                className={`flex w-full items-center ${
-                                  isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}
+                                className="flex w-full items-center text-gray-900"
                                 onClick={() => changeFontFamily(font)}
                               >
                                 <span style={{ fontFamily: font }}>
                                   {font}
                                 </span>
                                 {selectedTextProperties.fontFamily === font && (
-                                  <CheckIcon className={`ml-auto h-4 w-4 ${isDarkMode ? 'text-white' : 'text-black'}`} />
+                                  <CheckIcon className="ml-auto h-4 w-4 text-black" />
                                 )}
                               </button>
                             </CommandItem>
@@ -316,9 +291,9 @@ export function Toolbar({
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
-                      variant={isDarkMode ? "dark" : "outline"}
-                      size={"icon"}
-                      className="rounded-full hover:animate-jelly tooltip shrink-0 "
+                      variant="outline"
+                      size="icon"
+                      className="rounded-full hover:animate-jelly tooltip shrink-0"
                       style={{
                         backgroundColor: selectedTextProperties.fontColor,
                       }}
@@ -327,9 +302,7 @@ export function Toolbar({
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent
-                    className={`mt-3 w-fit p-0 rounded-lg ${
-                      isDarkMode ? 'bg-gray-800' : 'bg-transparent'
-                    }`}
+                    className="mt-3 w-fit p-0 rounded-lg bg-transparent"
                     align="start"
                   >
                     <HexColorPicker
@@ -345,28 +318,24 @@ export function Toolbar({
             )}
           </AnimatePresence>
           <div className="h-5">
-            <div className={`mx-1.5 h-full w-px ${
-              isDarkMode ? 'bg-gray-700' : 'bg-[#e5e5e5]'
-            }`}></div>
+            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
           </div>
           <Button
             onClick={deleteSelectedObject}
-            variant={isDarkMode ? "dark" : "outline"}
-            size={"icon"}
+            variant="outline"
+            size="icon"
             className="rounded-full hover:animate-jelly tooltip shrink-0"
           >
             <span className="tooltiptext">Delete</span>
             <Icons.trash className="size-4 text-red-600" />
           </Button>
           <div className="h-5">
-            <div className={`mx-1.5 h-full w-px ${
-              isDarkMode ? 'bg-gray-700' : 'bg-[#e5e5e5]'
-            }`}></div>
+            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
           </div>
           <Button
             onClick={downloadCanvas}
-            variant={isDarkMode ? "dark" : "outline"}
-            size={"icon"}
+            variant="outline"
+            size="icon"
             className={`rounded-full hover:animate-jelly tooltip shrink-0 ${
               !hasCanvasChanged && 'opacity-50 cursor-not-allowed hover:animate-none'
             }`}
