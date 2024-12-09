@@ -25,12 +25,14 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
-      <div className="px-2 pt-10 md:pt-16 space-y-10 min-h-screen items-center h-full flex-col flex justify-between bg-white text-black">
-        <canvas
-          ref={canvasRef}
-          className="border rounded-3xl overflow-hidden shadow-lg"
-        />
-        <div className="pt-10 pb-8 space-y-5 flex items-center flex-col">
+      <div className="px-2 pt-3 md:pt-16 min-h-screen flex flex-col bg-white text-black">
+        <div className="flex-1 flex items-center justify-center max-h-[75vh] md:max-h-none">
+          <canvas
+            ref={canvasRef}
+            className="border rounded-3xl overflow-hidden shadow-lg max-h-full w-auto"
+          />
+        </div>
+        <div className="py-2 md:py-4 space-y-2 md:space-y-4 flex items-center flex-col">
           <Toolbar
             setBackgroundImage={setBackgroundImage}
             addText={addText}
@@ -47,9 +49,9 @@ export default function HomePage() {
             isImageSelected={isImageSelected}
             hasCanvasChanged={hasCanvasChanged}
           />
-          <div className="flex flex-col justify-center text-center items-center text-sm md:flex-row">
+          <div className="flex flex-col justify-center text-center items-center text-xs md:text-sm md:flex-row">
             <a
-              className="text-balance leading-loose font-medium text-muted-foreground hover:text-blue-700"
+              className="text-balance leading-none font-medium text-muted-foreground hover:text-blue-700"
               href="https://x.com/kvinms97"
               target="_blank"
             >
