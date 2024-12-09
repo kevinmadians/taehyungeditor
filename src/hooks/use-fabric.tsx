@@ -223,12 +223,8 @@ export function useFabric() {
     const updateObjectsState = () => {
       if (!fabricCanvas) return;
       
-      const objects = fabricCanvas.getObjects()
-      const hasAnyObjects = objects.length > 0
       const hasSelectedObject = fabricCanvas.getActiveObject() !== null
-
-      // Only enable delete when there are objects AND one is selected
-      setHasObjects(hasAnyObjects && hasSelectedObject)
+      setHasObjects(hasSelectedObject)
     }
 
     // Call updateObjectsState initially

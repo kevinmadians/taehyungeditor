@@ -314,7 +314,7 @@ export function Toolbar({
             variant="outline"
             size="icon"
             className={`rounded-full shrink-0 ${
-              !hasObjects && 'opacity-50 cursor-not-allowed hover:animate-none'
+              !hasObjects && 'opacity-40 cursor-not-allowed hover:animate-none'
             }`}
             disabled={!hasObjects}
           >

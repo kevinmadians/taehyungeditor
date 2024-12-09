@@ -27,13 +27,13 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       <div className="px-2 pt-6 md:pt-16 min-h-screen flex flex-col bg-white text-black">
-        <div className="flex-1 flex items-center justify-center max-h-[70vh] md:max-h-none">
+        <div className="flex-none flex items-center justify-center">
           <canvas
             ref={canvasRef}
-            className="border rounded-3xl overflow-hidden shadow-lg max-h-full w-auto mt-4 md:mt-0"
+            className="border rounded-3xl overflow-hidden shadow-lg h-[60vh] w-auto md:h-auto"
           />
         </div>
-        <div className="py-2 md:py-4 space-y-2 md:space-y-4 flex items-center flex-col">
+        <div className="flex-none mt-8 md:mt-12 space-y-6 flex items-center flex-col">
           <Toolbar
             setBackgroundImage={setBackgroundImage}
             addText={addText}
@@ -51,7 +51,7 @@ export default function HomePage() {
             hasCanvasChanged={hasCanvasChanged}
             hasObjects={hasObjects}
           />
-          <div className="flex flex-col justify-center text-center items-center text-xs md:text-sm md:flex-row">
+          <div className="flex flex-col justify-center text-center items-center text-xs md:text-sm md:flex-row pb-6">
             <a
               className="text-balance leading-none font-medium text-muted-foreground hover:text-blue-700"
               href="https://x.com/kvinms97"
