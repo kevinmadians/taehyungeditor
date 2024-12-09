@@ -15,7 +15,7 @@ const geistMono = localFont({
 })
 
 export const metadata: Metadata = {
-  title: "Just a Chill Guy",
+  title: "Taehyung Editor",
 }
 
 export default function RootLayout({

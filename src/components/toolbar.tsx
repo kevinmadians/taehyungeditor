@@ -26,11 +26,12 @@ import { CheckIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { selectedTextPropertiesProps } from "@/hooks/use-fabric"
 import { AnimatePresence, motion } from "framer-motion"
+import { ImageSelector } from "./image-selector"
 
 interface ToolbarProps {
   setBackgroundImage: (imageUrl: string) => Promise<Canvas | null>
   addText: () => void
-  addChillGuy: () => void
+  addImage: (imagePath: string) => void
   changeFontFamily: (fontFamily: string) => void
   changeTextColor: (color: string) => void
   flipImage: (direction: "horizontal" | "vertical") => void
@@ -41,14 +42,16 @@ interface ToolbarProps {
   selectedTextProperties: selectedTextPropertiesProps
   toggleFilter: () => void
   isImageSelected: boolean
+  isDarkMode: boolean
+  hasCanvasChanged: boolean
 }
 
 export function Toolbar({
   setBackgroundImage,
   addText,
+  addImage,
   changeFontFamily,
   changeTextColor,
-  addChillGuy,
   flipImage,
   deleteSelectedObject,
   downloadCanvas,
@@ -57,7 +60,11 @@ export function Toolbar({
   selectedTextProperties,
   toggleFilter,
   isImageSelected,
+  isDarkMode,
+  hasCanvasChanged,
 }: ToolbarProps) {
+  const [isImageSelectorOpen, setIsImageSelectorOpen] = React.useState(false)
+
   const onDrop = React.useCallback(
     (acceptedFiles: File[]) => {
       if (acceptedFiles.length > 0) {
@@ -84,11 +91,13 @@ export function Toolbar({
 
   return (
     <div className="max-w-[100vw] px-5">
-      <div className="no-scrollbar w-full overflow-x-auto rounded-full border bg-white sm:overflow-visible">
+      <div className={`no-scrollbar w-full overflow-x-auto rounded-full border ${
+        isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+      } transition-colors duration-200 sm:overflow-visible`}>
         <div className="flex items-center space-x-2 p-2 text-2xl md:justify-center">
           <Button
             {...getRootProps()}
-            variant="outline"
+            variant={isDarkMode ? "dark" : "outline"}
             size={"icon"}
             className="rounded-full hover:animate-jelly tooltip shrink-0"
           >
@@ -99,16 +108,18 @@ export function Toolbar({
           <Popover>
             <PopoverTrigger asChild>
               <Button
-                variant="outline"
+                variant={isDarkMode ? "dark" : "outline"}
                 size={"icon"}
-                className="rounded-full hover:animate-jelly tooltip shrink-0 "
+                className="rounded-full hover:animate-jelly tooltip shrink-0"
                 style={{ backgroundColor: currentBackgroundColor }}
               >
                 <span className="tooltiptext">Color</span>
               </Button>
             </PopoverTrigger>
             <PopoverContent
-              className="mt-3 w-fit p-0 bg-transparent rounded-lg"
+              className={`mt-3 w-fit p-0 rounded-lg ${
+                isDarkMode ? 'bg-gray-800' : 'bg-transparent'
+              }`}
               align="start"
             >
               <HexColorPicker
@@ -121,20 +132,31 @@ export function Toolbar({
             </PopoverContent>
           </Popover>
           <div className="h-5">
-            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
+            <div className={`mx-1.5 h-full w-px ${
+              isDarkMode ? 'bg-gray-700' : 'bg-[#e5e5e5]'
+            }`}></div>
           </div>
           <Button
-            onClick={addChillGuy}
-            variant="outline"
+            onClick={() => setIsImageSelectorOpen(true)}
+            variant={isDarkMode ? "dark" : "outline"}
             size={"icon"}
             className="rounded-full hover:animate-jelly tooltip shrink-0"
           >
-            <span className="tooltiptext">Chill Guy</span>
+            <span className="tooltiptext">Add Image</span>
             <img
-              src={`${process.env.NEXT_PUBLIC_APP_URL}/chillguy.png`}
+              src="/chillguy.png"
               className="size-6"
             />
           </Button>
+          <ImageSelector
+            isOpen={isImageSelectorOpen}
+            onClose={() => setIsImageSelectorOpen(false)}
+            onSelectImage={(imagePath) => {
+              addImage(imagePath)
+              setIsImageSelectorOpen(false)
+            }}
+            isDarkMode={isDarkMode}
+          />
           <AnimatePresence>
             {isImageSelected && (
               <motion.div
@@ -151,7 +173,7 @@ export function Toolbar({
               >
                 <Button
                   onClick={() => flipImage("horizontal")}
-                  variant="outline"
+                  variant={isDarkMode ? "dark" : "outline"}
                   size={"icon"}
                   className="rounded-full hover:animate-jelly tooltip shrink-0"
                 >
@@ -160,7 +182,7 @@ export function Toolbar({
                 </Button>
                 <Button
                   onClick={() => toggleFilter()}
-                  variant="outline"
+                  variant={isDarkMode ? "dark" : "outline"}
                   size={"icon"}
                   className="rounded-full hover:animate-jelly tooltip shrink-0 "
                 >
@@ -171,11 +193,13 @@ export function Toolbar({
             )}
           </AnimatePresence>
           <div className="h-5">
-            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
+            <div className={`mx-1.5 h-full w-px ${
+              isDarkMode ? 'bg-gray-700' : 'bg-[#e5e5e5]'
+            }`}></div>
           </div>
           <Button
             onClick={addText}
-            variant="outline"
+            variant={isDarkMode ? "dark" : "outline"}
             size={"icon"}
             className="rounded-full hover:animate-jelly tooltip shrink-0"
           >
@@ -199,7 +223,7 @@ export function Toolbar({
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
-                      variant="outline"
+                      variant={isDarkMode ? "dark" : "outline"}
                       size={"icon"}
                       className="rounded-full hover:animate-jelly tooltip shrink-0"
                     >
@@ -209,76 +233,81 @@ export function Toolbar({
                   </PopoverTrigger>
                   <PopoverContent
                     align="start"
-                    className="max-w-[200px] w-full p-0 h-[250px] rounded-lg"
+                    className={`max-w-[200px] w-full p-0 h-[250px] rounded-lg ${
+                      isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'
+                    }`}
+                    sideOffset={5}
                   >
-                    <Command>
-                      <CommandInput placeholder="Search font family" />
-                      <CommandList className="hide_scrollbar">
-                        <CommandEmpty>No font family found.</CommandEmpty>
-                        <CommandGroup heading="Recommended">
-                          {/* <ScrollArea className="h-[250px] w-full"> */}
-                          {recommendedFonts.map((fontName) => {
-                            return (
-                              <CommandItem
-                                key={fontName}
-                                value={fontName}
-                                className={cn("cursor-pointer")}
-                                onSelect={(currentValue) => {
-                                  changeFontFamily(currentValue)
-                                }}
+                    <Command className={isDarkMode ? 'bg-gray-800 [&_[cmdk-group-heading]]:text-gray-400' : 'bg-white'}>
+                      <CommandInput 
+                        placeholder="Search font family" 
+                        className={isDarkMode ? 'text-white border-gray-700 placeholder:text-gray-500' : 'text-gray-900 border-gray-200'}
+                      />
+                      <CommandList>
+                        <CommandEmpty className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>
+                          No font family found.
+                        </CommandEmpty>
+                        <CommandGroup heading={
+                          <span className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>
+                            Recommended
+                          </span>
+                        }>
+                          {recommendedFonts.map((font) => (
+                            <CommandItem
+                              key={font}
+                              onSelect={() => changeFontFamily(font)}
+                              className={`cursor-pointer ${
+                                isDarkMode 
+                                  ? 'text-white hover:bg-gray-700' 
+                                  : 'text-gray-900 hover:bg-gray-100'
+                              }`}
+                            >
+                              <button 
+                                className={`flex w-full items-center ${
+                                  isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}
+                                onClick={() => changeFontFamily(font)}
                               >
-                                <span
-                                  style={{
-                                    fontFamily: `'${fontName}', sans-serif`,
-                                  }}
-                                >
-                                  {fontName}
+                                <span style={{ fontFamily: font }}>
+                                  {font}
                                 </span>
-                                <CheckIcon
-                                  className={cn(
-                                    "ml-auto size-4",
-                                    fontName ===
-                                      selectedTextProperties.fontFamily
-                                      ? "opacity-100"
-                                      : "opacity-0",
-                                  )}
-                                />
-                              </CommandItem>
-                            )
-                          })}
+                                {selectedTextProperties.fontFamily === font && (
+                                  <CheckIcon className={`ml-auto h-4 w-4 ${isDarkMode ? 'text-white' : 'text-black'}`} />
+                                )}
+                              </button>
+                            </CommandItem>
+                          ))}
                         </CommandGroup>
-                        <CommandGroup heading="Others">
-                          {/* <ScrollArea className="h-[250px] w-full"> */}
-                          {otherFonts.map((fontName) => {
-                            return (
-                              <CommandItem
-                                key={fontName}
-                                value={fontName}
-                                className={cn("cursor-pointer")}
-                                onSelect={(currentValue) => {
-                                  changeFontFamily(currentValue)
-                                }}
+                        <CommandGroup heading={
+                          <span className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>
+                            Others
+                          </span>
+                        }>
+                          {otherFonts.map((font) => (
+                            <CommandItem
+                              key={font}
+                              onSelect={() => changeFontFamily(font)}
+                              className={`cursor-pointer ${
+                                isDarkMode 
+                                  ? 'text-white hover:bg-gray-700' 
+                                  : 'text-gray-900 hover:bg-gray-100'
+                              }`}
+                            >
+                              <button 
+                                className={`flex w-full items-center ${
+                                  isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}
+                                onClick={() => changeFontFamily(font)}
                               >
-                                <span
-                                  style={{
-                                    fontFamily: `'${fontName}', sans-serif`,
-                                  }}
-                                >
-                                  {fontName}
+                                <span style={{ fontFamily: font }}>
+                                  {font}
                                 </span>
-                                <CheckIcon
-                                  className={cn(
-                                    "ml-auto size-4",
-                                    fontName ===
-                                      selectedTextProperties.fontFamily
-                                      ? "opacity-100"
-                                      : "opacity-0",
-                                  )}
-                                />
-                              </CommandItem>
-                            )
-                          })}
-                          {/* </ScrollArea> */}
+                                {selectedTextProperties.fontFamily === font && (
+                                  <CheckIcon className={`ml-auto h-4 w-4 ${isDarkMode ? 'text-white' : 'text-black'}`} />
+                                )}
+                              </button>
+                            </CommandItem>
+                          ))}
                         </CommandGroup>
                       </CommandList>
                     </Command>
@@ -287,7 +316,7 @@ export function Toolbar({
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
-                      variant="outline"
+                      variant={isDarkMode ? "dark" : "outline"}
                       size={"icon"}
                       className="rounded-full hover:animate-jelly tooltip shrink-0 "
                       style={{
@@ -298,7 +327,9 @@ export function Toolbar({
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent
-                    className="mt-3 w-fit p-0 bg-transparent rounded-lg"
+                    className={`mt-3 w-fit p-0 rounded-lg ${
+                      isDarkMode ? 'bg-gray-800' : 'bg-transparent'
+                    }`}
                     align="start"
                   >
                     <HexColorPicker
@@ -314,11 +345,13 @@ export function Toolbar({
             )}
           </AnimatePresence>
           <div className="h-5">
-            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
+            <div className={`mx-1.5 h-full w-px ${
+              isDarkMode ? 'bg-gray-700' : 'bg-[#e5e5e5]'
+            }`}></div>
           </div>
           <Button
             onClick={deleteSelectedObject}
-            variant="outline"
+            variant={isDarkMode ? "dark" : "outline"}
             size={"icon"}
             className="rounded-full hover:animate-jelly tooltip shrink-0"
           >
@@ -326,15 +359,22 @@ export function Toolbar({
             <Icons.trash className="size-4 text-red-600" />
           </Button>
           <div className="h-5">
-            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
+            <div className={`mx-1.5 h-full w-px ${
+              isDarkMode ? 'bg-gray-700' : 'bg-[#e5e5e5]'
+            }`}></div>
           </div>
           <Button
             onClick={downloadCanvas}
-            variant="outline"
+            variant={isDarkMode ? "dark" : "outline"}
             size={"icon"}
-            className="rounded-full hover:animate-jelly tooltip shrink-0"
+            className={`rounded-full hover:animate-jelly tooltip shrink-0 ${
+              !hasCanvasChanged && 'opacity-50 cursor-not-allowed hover:animate-none'
+            }`}
+            disabled={!hasCanvasChanged}
           >
-            <span className="tooltiptext">Download</span>
+            <span className="tooltiptext">
+              {hasCanvasChanged ? 'Download' : 'Make changes to download'}
+            </span>
             <Icons.download className="size-4" />
           </Button>
           {isMobile && (

@@ -4,7 +4,17 @@ import * as fabric from "fabric"
 import { useWindow } from "@/hooks/use-window"
 import { filterNames, getFilter } from "@/lib/constants"
 
-const CANVAS_DIMENSIONS = { default: 500, mobileMultiplier: 0.9 }
+interface CanvasDimensions {
+  width: number;
+  height: number;
+  mobileMultiplier: number;
+}
+
+const CANVAS_DIMENSIONS: CanvasDimensions = {
+  width: 1080,
+  height: 1920,
+  mobileMultiplier: 0.9
+}
 const DEFAULT_BACKGROUND_COLOR = "#8d927b"
 const DEFAULT_FONT_COLOR = "#000000"
 const DEFAULT_FONT_FAMILY = "Impact"
@@ -24,11 +34,22 @@ export interface selectedTextPropertiesProps {
   isTextSelected: boolean
 }
 
+const LIGHT_MODE_BG = "#ffffff"
+const DARK_MODE_BG = "#1a1a1a"
+const LIGHT_MODE_CANVAS_BG = "#8d927b"
+const DARK_MODE_CANVAS_BG = "#4a4a4a"
+
 export function useFabric() {
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
   const [canvas, setCanvas] = React.useState<Canvas | null>(null)
-  const [currentBackgroundColor, setCurrentBackgroundColor] =
-    React.useState<string>(DEFAULT_BACKGROUND_COLOR)
+  const [isDarkMode, setIsDarkMode] = React.useState<boolean>(false)
+  const [hasCanvasChanged, setHasCanvasChanged] = React.useState<boolean>(false)
+  const [showCenterLines, setShowCenterLines] = React.useState<boolean>(false)
+  const centerLineX = React.useRef<fabric.Line | null>(null)
+  const centerLineY = React.useRef<fabric.Line | null>(null)
+  const [currentBackgroundColor, setCurrentBackgroundColor] = React.useState<string>(
+    isDarkMode ? DARK_MODE_CANVAS_BG : LIGHT_MODE_CANVAS_BG
+  )
   const [selectedTextProperties, setSelectedTextProperties] =
     React.useState<selectedTextPropertiesProps>({
       fontFamily: DEFAULT_FONT_FAMILY,
@@ -39,16 +60,94 @@ export function useFabric() {
   const [currentFilterIndex, setCurrentFilterIndex] = React.useState<number>(0)
   const { isMobile, windowSize } = useWindow()
 
+  // Initial canvas setup
   React.useEffect(() => {
     if (!canvasRef.current) return
 
     const fabricCanvas = new Canvas(canvasRef.current, {
-      width: CANVAS_DIMENSIONS.default,
-      height: CANVAS_DIMENSIONS.default,
+      width: CANVAS_DIMENSIONS.width,
+      height: CANVAS_DIMENSIONS.height,
     })
 
     setCanvas(fabricCanvas)
     fabricCanvas.backgroundColor = currentBackgroundColor
+
+    // Create center lines (initially hidden)
+    const verticalLine = new fabric.Line([0, 0, 0, fabricCanvas.height!], {
+      stroke: isDarkMode ? '#ffffff' : '#000000',
+      opacity: 0.5,
+      selectable: false,
+      evented: false,
+      visible: false,
+      strokeDashArray: [4, 4],
+    })
+
+    const horizontalLine = new fabric.Line([0, 0, fabricCanvas.width!, 0], {
+      stroke: isDarkMode ? '#ffffff' : '#000000',
+      opacity: 0.5,
+      selectable: false,
+      evented: false,
+      visible: false,
+      strokeDashArray: [4, 4],
+    })
+
+    centerLineX.current = verticalLine
+    centerLineY.current = horizontalLine
+    fabricCanvas.add(verticalLine, horizontalLine)
+
+    // Track object movement
+    fabricCanvas.on('object:moving', (e) => {
+      if (!e.target) return
+      const obj = e.target
+      const objCenter = obj.getCenterPoint()
+      const canvasCenter = {
+        x: fabricCanvas.width! / 2,
+        y: fabricCanvas.height! / 2,
+      }
+
+      // Show center lines only when object is near center (without snapping)
+      const threshold = 5
+      const nearCenterX = Math.abs(objCenter.x - canvasCenter.x) < threshold
+      const nearCenterY = Math.abs(objCenter.y - canvasCenter.y) < threshold
+
+      // Show vertical line when near center X
+      verticalLine.set({
+        visible: nearCenterX,
+        x1: canvasCenter.x,
+        x2: canvasCenter.x,
+        y1: 0,
+        y2: fabricCanvas.height,
+      })
+
+      // Show horizontal line when near center Y
+      horizontalLine.set({
+        visible: nearCenterY,
+        y1: canvasCenter.y,
+        y2: canvasCenter.y,
+        x1: 0,
+        x2: fabricCanvas.width,
+      })
+
+      fabricCanvas.renderAll()
+    })
+
+    // Hide center lines when object movement ends
+    const hideLines = () => {
+      if (verticalLine && horizontalLine) {
+        verticalLine.set({ visible: false })
+        horizontalLine.set({ visible: false })
+        fabricCanvas.renderAll()
+      }
+    }
+
+    fabricCanvas.on('object:modified', hideLines)
+    fabricCanvas.on('selection:cleared', hideLines)
+    fabricCanvas.on('mouse:up', hideLines)
+
+    // Track canvas changes
+    fabricCanvas.on("object:added", () => setHasCanvasChanged(true))
+    fabricCanvas.on("object:removed", () => setHasCanvasChanged(true))
+    fabricCanvas.on("object:modified", () => setHasCanvasChanged(true))
 
     // Add a listener for when an object is added to the canvas
     fabricCanvas.on("object:added", (e) => {
@@ -125,6 +224,14 @@ export function useFabric() {
       fabricCanvas.off("selection:updated", updateSelectedProperties)
       fabricCanvas.off("selection:cleared", updateSelectedProperties)
       fabricCanvas.off("object:modified", updateSelectedProperties)
+      fabricCanvas.off("object:added", () => setHasCanvasChanged(true))
+      fabricCanvas.off("object:removed", () => setHasCanvasChanged(true))
+      fabricCanvas.off("object:modified", () => setHasCanvasChanged(true))
+      fabricCanvas.off('object:modified', hideLines)
+      fabricCanvas.off('selection:cleared', hideLines)
+      fabricCanvas.off('mouse:up', hideLines)
+      centerLineX.current = null
+      centerLineY.current = null
       fabricCanvas.dispose()
     }
   }, [])
@@ -154,15 +261,52 @@ export function useFabric() {
     }
   }, [canvas, deleteSelectedObject])
 
-  function adjustCanvasSize(fabricCanvas: Canvas, isMobile: boolean) {
-    const size = isMobile
-      ? Math.min(
-          windowSize.width! * CANVAS_DIMENSIONS.mobileMultiplier,
-          CANVAS_DIMENSIONS.default,
-        )
-      : CANVAS_DIMENSIONS.default
+  React.useEffect(() => {
+    if (!canvas) return
+    
+    // Update canvas background color when dark mode changes
+    setCurrentBackgroundColor(isDarkMode ? DARK_MODE_CANVAS_BG : LIGHT_MODE_CANVAS_BG)
+    canvas.backgroundColor = isDarkMode ? DARK_MODE_CANVAS_BG : LIGHT_MODE_CANVAS_BG
+    canvas.renderAll()
+  }, [isDarkMode, canvas])
 
-    fabricCanvas.setDimensions({ width: size, height: size })
+  // Track background color changes
+  React.useEffect(() => {
+    if (currentBackgroundColor !== (isDarkMode ? DARK_MODE_CANVAS_BG : LIGHT_MODE_CANVAS_BG)) {
+      setHasCanvasChanged(true)
+    }
+  }, [currentBackgroundColor, isDarkMode])
+
+  // Update center lines color when dark mode changes
+  React.useEffect(() => {
+    if (centerLineX.current && centerLineY.current) {
+      const color = isDarkMode ? '#ffffff' : '#000000'
+      centerLineX.current.set({ stroke: color })
+      centerLineY.current.set({ stroke: color })
+      canvas?.renderAll()
+    }
+  }, [isDarkMode, canvas])
+
+  function adjustCanvasSize(fabricCanvas: Canvas, isMobile: boolean) {
+    if (isMobile) {
+      // On mobile, fit width to screen and maintain 9:16 ratio
+      const maxWidth = Math.min(windowSize.width! * CANVAS_DIMENSIONS.mobileMultiplier, CANVAS_DIMENSIONS.width);
+      const height = (maxWidth * 16) / 9;
+      
+      fabricCanvas.setDimensions({ 
+        width: maxWidth, 
+        height: height 
+      });
+    } else {
+      // On desktop, fit height to viewport and maintain 9:16 ratio
+      const maxHeight = Math.min(windowSize.height! * 0.8, CANVAS_DIMENSIONS.height);
+      const width = (maxHeight * 9) / 16;
+      
+      fabricCanvas.setDimensions({ 
+        width: width, 
+        height: maxHeight 
+      });
+    }
   }
 
   async function setBackgroundImage(imageUrl: string): Promise<Canvas | null> {
@@ -176,22 +320,25 @@ export function useFabric() {
     }
 
     if (windowSize.width! > 768) {
-      // Desktop: Adjust canvas width based on the image aspect ratio
-      const imgWidth = (img.width! * CANVAS_DIMENSIONS.default) / img.height!
-
-      canvas.setDimensions({
-        width: imgWidth,
-        height: CANVAS_DIMENSIONS.default,
-      })
+      // Desktop: maintain aspect ratio but fit in viewport
+      const maxHeight = windowSize.height! * 0.8; // 80% of viewport height
+      const scale = maxHeight / CANVAS_DIMENSIONS.height;
+      const scaledWidth = CANVAS_DIMENSIONS.width * scale;
+      
+      canvas.setDimensions({ 
+        width: scaledWidth, 
+        height: maxHeight 
+      });
     } else {
-      // Mobile: Adjust canvas dimensions to remain square or constrained
-      const size = Math.min(
-        windowSize.width! * CANVAS_DIMENSIONS.mobileMultiplier,
-
-        CANVAS_DIMENSIONS.default,
-      )
-
-      canvas.setDimensions({ width: size, height: size })
+      // Mobile: Scale width to screen size and maintain aspect ratio
+      const maxWidth = windowSize.width! * CANVAS_DIMENSIONS.mobileMultiplier;
+      const scale = maxWidth / CANVAS_DIMENSIONS.width;
+      const scaledHeight = CANVAS_DIMENSIONS.height * scale;
+      
+      canvas.setDimensions({ 
+        width: maxWidth, 
+        height: scaledHeight 
+      });
     }
 
     // Scale the background image to cover the entire canvas
@@ -222,7 +369,7 @@ export function useFabric() {
     const text = new fabric.Textbox(DEFAULT_TEXT_OPTIONS.text, {
       ...DEFAULT_TEXT_OPTIONS,
       left: canvas.getWidth() / 2,
-      top: canvas.getHeight() / 2,
+      top: canvas.getHeight() / 3,
       width: canvas.getWidth() * 0.8,
       originX: "center",
       originY: "center",
@@ -238,16 +385,22 @@ export function useFabric() {
 
     const activeObject = canvas.getActiveObject()
     if (activeObject && activeObject.type === "textbox") {
-      const text = activeObject as fabric.Textbox
-      text.set("fontFamily", fontFamily)
+      try {
+        activeObject.set({
+          fontFamily: fontFamily,
+        })
 
-      // Immediately update the selected text properties
-      setSelectedTextProperties((prev) => ({
-        ...prev,
-        fontFamily: fontFamily,
-      }))
+        // Force a re-render of the canvas
+        canvas.requestRenderAll()
 
-      canvas.renderAll()
+        // Update the selected text properties
+        setSelectedTextProperties((prev) => ({
+          ...prev,
+          fontFamily: fontFamily,
+        }))
+      } catch (error) {
+        console.error("Error changing font family:", error)
+      }
     }
   }
 
@@ -269,11 +422,10 @@ export function useFabric() {
     }
   }
 
-  async function addChillGuy() {
+  async function addImage(imagePath: string) {
     if (!canvas) return
 
-    const imageUrl = `${process.env.NEXT_PUBLIC_APP_URL}/chillguy.png`
-    const img = await FabricImage.fromURL(imageUrl)
+    const img = await FabricImage.fromURL(imagePath)
 
     if (!img) {
       console.error("Failed to load image")
@@ -282,8 +434,8 @@ export function useFabric() {
 
     const { width, height } = canvas
     const scale = Math.min(
-      (width! * 0.5) / img.width!,
-      (height! * 0.5) / img.height!,
+      (width! * 0.4) / img.width!,
+      (height! * 0.3) / img.height!
     )
 
     img.set({
@@ -351,7 +503,7 @@ export function useFabric() {
   }
 
   function downloadCanvas() {
-    if (!canvas) return
+    if (!canvas || !hasCanvasChanged) return
 
     const dataURL = canvas.toDataURL({
       format: "png",
@@ -375,11 +527,15 @@ export function useFabric() {
     }
   }
 
+  function toggleDarkMode() {
+    setIsDarkMode(prev => !prev)
+  }
+
   return {
     canvasRef,
     setBackgroundImage,
     addText,
-    addChillGuy,
+    addImage,
     changeFontFamily,
     changeTextColor,
     flipImage,
@@ -390,5 +546,8 @@ export function useFabric() {
     selectedTextProperties,
     toggleFilter,
     isImageSelected,
+    isDarkMode,
+    toggleDarkMode,
+    hasCanvasChanged,
   }
 }
